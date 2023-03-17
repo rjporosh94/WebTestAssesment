@@ -1,7 +1,7 @@
 ﻿
 USE [TestAssesmentDB]
 GO
-/****** Object:  StoredProcedure [dbo].[Sp_CreateMarks]    Script Date: 3/14/2023 1:10:51 AM ******/
+/****** Object:  StoredProcedure [dbo].[Sp_CreateMarks]    Script Date: 3/17/2023 9:58:12 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -24,44 +24,47 @@ END
 
 GO
 
-Create Procedure Sp_CreateMarks   
-    @StudentId int,
-    @CourseId int,
-	@Marks int
+--Create Procedure Sp_CreateMarks   
+--    @StudentId int,
+--    @CourseId int,
+--	@Marks int
 
-AS
-BEGIN
-    SET NOCOUNT ON;
-	SET IDENTITY_INSERT Marks ON;
-    Insert into Marks(
-           [StudentId]
-           ,[CourseId]
-		   ,[Marks]
-           )
- Values (@StudentId, @CourseId,@Marks)
- SET IDENTITY_INSERT Marks OFF;
-END
-GO
+--AS
+--BEGIN
+--    SET NOCOUNT ON;
+--	SET IDENTITY_INSERT Marks ON;
+--    Insert into Marks(
+--           [StudentId]
+--           ,[CourseId]
+--		   ,[Marks]
+--           )
+-- Values (@StudentId, @CourseId,@Marks)
+-- SET IDENTITY_INSERT Marks OFF;
+--END
+--GO
 
 CREATE OR ALTER  Procedure Sp_GetMarks   
-    @StudentId int
-
 AS
 BEGIN
-Select FullName = Students.FullName,CourseName = Courses.CouseName, TotalMarks = SUM(Marks)  , Average = AVG(Marks) From Marks 
-JOIN Students
-  ON Students.Id = Marks.StudentId
-JOIN Courses
-  ON Courses.Id = Marks.CourseId
-  GROUP BY StudentId
-  ;
-END 
+Select FullName = Student.FullName,CourseName = STRING_AGG(Courses.CourseName,', '), TotalMarks = SUM(Marks)  , Average = AVG(Marks) From Marks m
+LEFT JOIN Student
+  ON Student.Id = m.StudentId
+LEFT JOIN Courses
+  ON Courses.Id = m.CourseId
+  GROUP BY FullName,m.Id
+END 
 GO
 
 CREATE OR ALTER VIEW marksview
 AS
-SELECT  a.FullName, b.CourseName , c.Marks
-FROM Students a, Courses b, Marks c
+SELECT  Id= c.Id, a.FullName,b.CourseName
+--,STRING_AGG(b.CourseName,', ')
+, c.Marks
+--, TotalMarks = SUM(Marks)  , Average = AVG(Marks)
+FROM Student a, Courses b, Marks c
 WHERE a.Id=c.StudentId
-AND b.Id=c.CourseId;
+AND b.Id=c.CourseId 
+--GROUP BY FullName,c.Id
+GO
+
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WebTestAssesment.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebTestAssesment.Controllers
 {
@@ -26,10 +28,59 @@ namespace WebTestAssesment.Controllers
         // GET: Marks
         public async Task<IActionResult> Index()
         {
-            var testAssesmentDbContext = _context.Marks.Include(m => m.Course).Include(m => m.Student);
-            return View(await testAssesmentDbContext.ToListAsync());
-        }
+            var testAssesmentDbContext = await _context.Marks.Include(m => m.Course).Include(m => m.Student).ToListAsync();
+                //.GroupBy(m => m.Student.FullName)
+                //.ToListAsync();
+            //    .Select(g => new {
+            //    FullName = g.Key,
+            //    CourseName = string.Join(", ", g.Select(n => n.Course.CourseName)),
+            //    TotalMarks = g.Sum(m => m.Marks),
+            //    Average = g.Average(m => m.Marks)
+            //}).ToListAsync();
 
+            var result = _context.Marks
+                .GroupBy(m => m.Student.FullName)
+                .Select(g => new
+                    {
+                      //  Id = string.Join(", ", g.Select(m => m.Id)),
+                        FullName = g.Key,
+                        CourseName = string.Join(", ", g.Select(m => m.Course.CourseName)),
+                        TotalMarks = g.Sum(m => m.Marks),
+                        Average = g.Average(m => m.Marks)
+                    })
+                .ToList();
+           
+               // var tmp = testAssesmentDbContext.GroupBy(x => x.StudentId);
+
+            return View(testAssesmentDbContext);
+        }
+        // GET: MarksView only
+        public async Task<IActionResult> MarksView()
+        {
+            //var testAssesmentDbContext =  _context.Marks.Include(m => m.Course).Include(m => m.Student).ToListAsync();
+
+            var result = await  _context.Marks
+                .GroupBy(m => m.Student.FullName)
+                .Select(g => new MarksViewModel
+                {
+                    //  Id = string.Join(", ", g.Select(m => m.Id)),
+                    FullName = g.Key,
+                    CourseName = string.Join(", ", g.Select(m => m.Course.CourseName)),
+                    CoursesNames = g.Select(m => m.Course.CourseName).ToList(),
+                    CoursesMarks = g.Select(m => m.Marks).ToList(),
+                    TotalMarks = g.Sum(m => m.Marks),
+                    Average = g.Average(m => m.Marks)
+                })
+                .ToListAsync();
+            // var tmp = testAssesmentDbContext.GroupBy(x => x.StudentId);
+
+
+            List<Course> courses =await _context.Courses.ToListAsync();
+            
+            ViewData["Courses"] = courses;
+
+            return View(result);
+        }
         // GET: Marks/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -198,5 +249,16 @@ namespace WebTestAssesment.Controllers
                 new SqlParameter("@Marks", mark)
                 );
         }
+    }
+
+    public partial class MarksViewModel
+    {
+        // public string Id { get; set; }
+        public string FullName { get; set; }
+        public string CourseName { get; set; }
+        public List<string> CoursesNames { get; set; }
+        public List<int> CoursesMarks { get; set; }
+        public int TotalMarks { get; set; }
+        public double Average { get; set; }
     }
 }

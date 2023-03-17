@@ -40,7 +40,6 @@ namespace WebTestAssesment.Controllers
             {
                 return NotFound();
             }
-            student.FullName = student.FullName.ToUpper();
             return View(student);
         }
 
