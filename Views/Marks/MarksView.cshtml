@@ -39,11 +39,40 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.CourseName)
                 </td>
-
-                @foreach (var employee in (IEnumerable<Course>)ViewData["Courses"])
-                {
-                    <td></td>
+                @{
+                    var sn = item.StudentId;
+                    var cn = item.CourseId;
+                    int cc = item.CoursesCount;
+                    int i = 0;
+                    if (item.CoursesNames.Count < cc)
+                    {
+                        for (int ii = item.CoursesMarks.Count; ii < cc; ii++)
+                        {
+                            item.CoursesMarks.Add(0);
+                        }
+                        
+                    }
                 }
+                @foreach(var mark in item.CoursesMarks)
+                {
+                    if (i <= cc)
+                    {
+                        if (item.CoursesMarks[i]!=0)
+                        {
+                            <td>
+                                @item.CoursesMarks[i]
+                            </td>
+                        }  
+                      else
+                        {
+                            <td>
+                            </td>
+                        }
+                    }
+                   
+                    i++;
+                }
+           
                 <td>
                     @Html.DisplayFor(modelItem => item.TotalMarks)
                 </td>

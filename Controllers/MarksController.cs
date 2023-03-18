@@ -58,14 +58,22 @@ namespace WebTestAssesment.Controllers
         public async Task<IActionResult> MarksView()
         {
             //var testAssesmentDbContext =  _context.Marks.Include(m => m.Course).Include(m => m.Student).ToListAsync();
+            List<Course> courses = await _context.Courses.ToListAsync();
+            List<Mark> marks = await _context.Marks.ToListAsync();
+            ViewData["Courses"] = courses;
+            ViewData["Marks"] = marks;
 
             var result = await  _context.Marks
                 .GroupBy(m => m.Student.FullName)
                 .Select(g => new MarksViewModel
                 {
-                    //  Id = string.Join(", ", g.Select(m => m.Id)),
+                    Id = string.Join(", ", g.Select(m => m.Id)),
                     FullName = g.Key,
                     CourseName = string.Join(", ", g.Select(m => m.Course.CourseName)),
+                    Roll = g.Select(m => m.Student.Roll).FirstOrDefault(),
+                    StudentId = g.Select(m=>m.StudentId).FirstOrDefault(),
+                    CourseId = g.Select(m=>m.CourseId).FirstOrDefault(),
+                    CoursesCount = courses.Count(),
                     CoursesNames = g.Select(m => m.Course.CourseName).ToList(),
                     CoursesMarks = g.Select(m => m.Marks).ToList(),
                     TotalMarks = g.Sum(m => m.Marks),
@@ -75,10 +83,7 @@ namespace WebTestAssesment.Controllers
             // var tmp = testAssesmentDbContext.GroupBy(x => x.StudentId);
 
 
-            List<Course> courses =await _context.Courses.ToListAsync();
             
-            ViewData["Courses"] = courses;
-
             return View(result);
         }
         // GET: Marks/Details/5
@@ -253,8 +258,12 @@ namespace WebTestAssesment.Controllers
 
     public partial class MarksViewModel
     {
-        // public string Id { get; set; }
+        public string Id { get; set; }
+        public int StudentId { get; set; }
+        public int CoursesCount { get; set; }
+        public int CourseId { get; set; }
         public string FullName { get; set; }
+        public string Roll { get; set; }
         public string CourseName { get; set; }
         public List<string> CoursesNames { get; set; }
         public List<int> CoursesMarks { get; set; }

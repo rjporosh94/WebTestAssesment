@@ -14,7 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="FullName" class="control-label"></label>
-                <input asp-for="FullName" id="FullName" class="form-control" />
+                <input asp-for="FullName" id="FullName" onkeyup="this.value = this.value.toUpperCase();" class="form-control uc-text" />
                 <span asp-validation-for="FullName" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -24,7 +24,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Roll" class="control-label"></label>
-                <input asp-for="Roll" class="form-control" />
+                <input asp-for="Roll" class="form-control uc-text" onkeyup="this.value = this.value.toUpperCase();" />
                 <span asp-validation-for="Roll" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -39,6 +39,39 @@
 </div>
 <script type="text/javascript">
     document.getElementById("FullName").innerHTML = document.getElementById("FullName").value.toUpperCase();
+    var forceInputUppercase = function (e) {
+        let el = e.target;
+        let start = el.selectionStart;
+        let end = el.selectionEnd;
+        el.value = el.value.toUpperCase();
+        el.setSelectionRange(start, end);
+    };
+
+    document.querySelectorAll(".uc-text").forEach(function (current) {
+        current.addEventListener("keyup", forceInputUppercase);
+
+
+        //To Disable Inspect
+        // Disable right-click
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        function ctrlShiftKey(e, keyCode) {
+            return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+        }
+
+        document.onkeydown = (e) => {
+            // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+            if (
+                event.keyCode === 123 ||
+                ctrlShiftKey(e, 'I') ||
+                ctrlShiftKey(e, 'J') ||
+                ctrlShiftKey(e, 'C') ||
+                (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+            ) {
+                alert("inspecting not allowed! ,Dont do it again.");
+                return false;
+            }
+        }
 </script>
 
 @section Scripts {

@@ -14,8 +14,8 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="CourseName" class="control-label"></label>
-                <input asp-for="CourseName" class="form-control" />
+                <label asp-for="CourseName"  class="control-label"></label>
+                <input asp-for="CourseName" onkeyup="this.value = this.value.toUpperCase();" class="form-control uc-text" />
                 <span asp-validation-for="CourseName" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -32,3 +32,16 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+<script type="text/javascript">
+    var forceInputUppercase = function (e) {
+        let el = e.target;
+        let start = el.selectionStart;
+        let end = el.selectionEnd;
+        el.value = el.value.toUpperCase();
+        el.setSelectionRange(start, end);
+    };
+
+    document.querySelectorAll(".uc-text").forEach(function (current) {
+        current.addEventListener("keyup", forceInputUppercase);
+    });
+</script>

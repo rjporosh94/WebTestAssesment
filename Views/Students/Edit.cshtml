@@ -16,7 +16,7 @@
             <div class="form-group">
                 <label asp-for="FullName" class="control-label"></label>
           @*      <input asp-for="FullName" id="FullName" class="form-control" />*@
-                <input asp-for="FullName" id="FullName" class="form-control" />
+                <input asp-for="FullName" id="FullName" onkeyup="this.value = this.value.toUpperCase();" class="form-control" />
                 <span asp-validation-for="FullName" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Roll" class="control-label"></label>
-                <input asp-for="Roll" class="form-control" />
+                <input asp-for="Roll" onkeyup="this.value = this.value.toUpperCase();" class="form-control" />
                 <span asp-validation-for="Roll" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -41,6 +41,30 @@
 </div>
 <script type="text/javascript">
     document.getElementById("FullName").innerHTML = document.getElementById("FullName").value.toUpperCase();
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+
+    //To Disable Inspect
+    // Disable right-click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    function ctrlShiftKey(e, keyCode) {
+        return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+    }
+
+    document.onkeydown = (e) => {
+        // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+        if (
+            event.keyCode === 123 ||
+            ctrlShiftKey(e, 'I') ||
+            ctrlShiftKey(e, 'J') ||
+            ctrlShiftKey(e, 'C') ||
+            (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+        )
+            return false;
+    };
+
+        });
 </script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
